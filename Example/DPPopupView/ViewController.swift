@@ -7,13 +7,23 @@
 //
 
 import UIKit
+import DPPopupView
 
 class ViewController: UIViewController {
-
+    fileprivate let popupView: DPPopupView = {
+        let view = DPPopupView()
+        view.backgroundColor = .gray
+        return view
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .yellow
+        setupViews()
+        view.backgroundColor = .white
     }
-
+    
+    fileprivate func setupViews() {
+        view.addSubview(popupView)
+    }
 }
 
