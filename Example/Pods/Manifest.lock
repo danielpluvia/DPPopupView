@@ -1,0 +1,16 @@
+PODS:
+  - DPPopupView (0.1.0)
+
+DEPENDENCIES:
+  - DPPopupView (from `../`)
+
+EXTERNAL SOURCES:
+  DPPopupView:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  DPPopupView: d6d4f23a3e9a3af210c3b46bfbc5c92521e6f30b
+
+PODFILE CHECKSUM: 6e0aea942afe461e4d02e82d32d14cdaeb304d13
+
+COCOAPODS: 1.6.0

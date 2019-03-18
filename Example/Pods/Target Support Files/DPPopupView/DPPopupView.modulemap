@@ -1,0 +1,6 @@
+framework module DPPopupView {
+  umbrella header "DPPopupView-umbrella.h"
+
+  export *
+  module * { export * }
+}

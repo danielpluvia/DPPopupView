@@ -1,0 +1,6 @@
+framework module Pods_DPPopupView_Example {
+  umbrella header "Pods-DPPopupView_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}

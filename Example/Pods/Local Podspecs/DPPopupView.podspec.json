@@ -1,0 +1,22 @@
+{
+  "name": "DPPopupView",
+  "version": "0.1.0",
+  "summary": "A short description of DPPopupView.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/danielpluvia/DPPopupView",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "danielpluvia": "danielpluvia@outlook.com"
+  },
+  "source": {
+    "git": "https://github.com/danielpluvia/DPPopupView.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "DPPopupView/Classes/**/*"
+}
