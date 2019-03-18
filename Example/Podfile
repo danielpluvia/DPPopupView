@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'DPPopupView_Example' do
+  pod 'DPPopupView', :path => '../'
+
+  target 'DPPopupView_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
