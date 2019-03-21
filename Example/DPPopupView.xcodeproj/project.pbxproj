@@ -209,12 +209,10 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = CC8LGG6TEP;
 						LastSwiftMigration = 1010;
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = CC8LGG6TEP;
 						LastSwiftMigration = 1010;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
@@ -475,7 +473,7 @@
 			baseConfigurationReference = F133B6F478639A08DC767F1A /* Pods-DPPopupView_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = CC8LGG6TEP;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = DPPopupView/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -491,7 +489,7 @@
 			baseConfigurationReference = E28A349DDDE1C7ECC51608EB /* Pods-DPPopupView_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = CC8LGG6TEP;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = DPPopupView/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -506,7 +504,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CC2BDD58F71A80384CDB4186 /* Pods-DPPopupView_Tests.debug.xcconfig */;
 			buildSettings = {
-				DEVELOPMENT_TEAM = CC8LGG6TEP;
+				DEVELOPMENT_TEAM = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -526,7 +524,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5CCD7BA9A021234460FB2DAE /* Pods-DPPopupView_Tests.release.xcconfig */;
 			buildSettings = {
-				DEVELOPMENT_TEAM = CC8LGG6TEP;
+				DEVELOPMENT_TEAM = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Tests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
