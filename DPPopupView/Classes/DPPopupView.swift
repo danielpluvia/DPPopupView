@@ -22,6 +22,8 @@ open class DPPopupView: UIView {
         }
     }
     
+    public let containerView = UIView()
+    
     fileprivate let popupOffset: CGFloat = 340
     fileprivate let viewHeight: CGFloat = 500
     fileprivate var bottomConstraint: NSLayoutConstraint?
@@ -70,12 +72,19 @@ extension DPPopupView {
     
     fileprivate func setupViews() {
         addSubview(headerView)
+        addSubview(containerView)
         headerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(equalTo: topAnchor),
             headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            headerView.heightAnchor.constraint(equalToConstant: 20)
+            headerView.heightAnchor.constraint(equalToConstant: 20),
+            // contianerView
+            containerView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
+            containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            containerView.trailingAnchor.constraint(equalTo: trailingAnchor)
             ])
     }
     
@@ -113,7 +122,7 @@ extension DPPopupView {
             if !runningAnimators.isEmpty && runningAnimators[0].isReversed { progress *= -1 }
             progress += progressWhenInterrupted
             updateInteractiveTransition(fractionComplete: progress)
-        case .ended:
+        case .ended:    // https://www.youtube.com/watch?v=Yrb78U3V16g&t=601s
             let yVelocity = recognizer.velocity(in: self).y
             if yVelocity == 0 {
                 continueInteractiveTransition()
