@@ -23,13 +23,13 @@ open class DPPopupView: UIView {
     }
     
     public let containerView = UIView()
+    open var duration: TimeInterval = 1.0
+    open var popupOffset: CGFloat = 340
+    open var viewHeight: CGFloat = 500
     
-    fileprivate let popupOffset: CGFloat = 340
-    fileprivate let viewHeight: CGFloat = 500
     fileprivate var bottomConstraint: NSLayoutConstraint?
     fileprivate var currentState: State = .expanded
     fileprivate var progressWhenInterrupted: CGFloat = 0.0
-    fileprivate var duration: TimeInterval = 1.0
     // Tracks all running animators
     var runningAnimators = [UIViewPropertyAnimator]()
     
