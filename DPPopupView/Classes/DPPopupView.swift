@@ -168,6 +168,8 @@ extension DPPopupView {
                 self.currentState = state
             case .current:
                 break
+            @unknown default:
+                fatalError("@unknown default");
             }
             // manually reset the constraint positions
             switch self.currentState {
