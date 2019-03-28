@@ -26,18 +26,39 @@ open class DPPopupView: UIView {
     open var duration: TimeInterval = 1.0
     open var popupOffset: CGFloat = 340
     open var viewHeight: CGFloat = 500
+    open var cornerRadius: CGFloat = 16.0
+    open var containerInset: UIEdgeInsets = .zero {
+        didSet {
+            if oldValue.top != containerInset.top {
+                containerTopConstraint?.constant = containerInset.top
+            }
+            if oldValue.left != containerInset.left {
+                containerLeadingConstraint?.constant = containerInset.left
+            }
+            if oldValue.bottom != containerInset.bottom {
+                containerBottomConstraint?.constant = -containerInset.bottom
+            }
+            if oldValue.right != containerInset.right {
+                containerTrailingConstraint?.constant = -containerInset.right
+            }
+        }
+    }
+    public let headerView: UIView = {
+        let view = DPPopupArrowView()
+        return view
+    }()
     
     fileprivate var bottomConstraint: NSLayoutConstraint?
     fileprivate var currentState: State = .expanded
     fileprivate var progressWhenInterrupted: CGFloat = 0.0
     // Tracks all running animators
-    var runningAnimators = [UIViewPropertyAnimator]()
+    fileprivate var runningAnimators = [UIViewPropertyAnimator]()
+    // AutoLayout
+    fileprivate var containerTopConstraint: NSLayoutConstraint?
+    fileprivate var containerLeadingConstraint: NSLayoutConstraint?
+    fileprivate var containerBottomConstraint: NSLayoutConstraint?
+    fileprivate var containerTrailingConstraint: NSLayoutConstraint?
     
-    fileprivate let headerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .red
-        return view
-    }()
     fileprivate lazy var tapGesture: UITapGestureRecognizer = {
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         return recognizer
@@ -46,6 +67,12 @@ open class DPPopupView: UIView {
         let recognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
         return recognizer
     }()
+    
+    open override var bounds: CGRect {
+        didSet {
+            setShadow()
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -59,15 +86,18 @@ open class DPPopupView: UIView {
     open override func didMoveToSuperview() {
         super.didMoveToSuperview()
         setupBottomConstraint()
+        setFinalUI(accordingTo: currentState)
     }
 }
 
 // MARK: - Layouts
 extension DPPopupView {
     fileprivate func initialization() {
+        backgroundColor = .white
         translatesAutoresizingMaskIntoConstraints = false
         setupViews()
         setupGestures()
+        setShadow()
     }
     
     fileprivate func setupViews() {
@@ -75,17 +105,22 @@ extension DPPopupView {
         addSubview(containerView)
         headerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.translatesAutoresizingMaskIntoConstraints = false
+        // Header View
         NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(equalTo: topAnchor),
             headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            headerView.heightAnchor.constraint(equalToConstant: 20),
-            // contianerView
-            containerView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
-            containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            containerView.trailingAnchor.constraint(equalTo: trailingAnchor)
+            headerView.heightAnchor.constraint(equalToConstant: 30),
             ])
+        // Container View
+        containerTopConstraint = containerView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: containerInset.top)
+        containerLeadingConstraint = containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: containerInset.left)
+        containerBottomConstraint = containerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -containerInset.bottom)
+        containerTrailingConstraint = containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -containerInset.right)
+        containerTopConstraint?.isActive = true
+        containerLeadingConstraint?.isActive = true
+        containerBottomConstraint?.isActive = true
+        containerTrailingConstraint?.isActive = true
     }
     
     fileprivate func setupBottomConstraint() {
@@ -102,6 +137,13 @@ extension DPPopupView {
     fileprivate func setupGestures() {
         headerView.addGestureRecognizer(tapGesture)
         addGestureRecognizer(panGesture)
+    }
+    
+    fileprivate func setShadow() {
+        layer.shadowColor = UIColor.gray.cgColor
+        layer.shadowRadius = 6.0
+        layer.shadowOpacity = 0.4
+        layer.shadowPath = UIBezierPath(rect: bounds).cgPath
     }
 }
 
@@ -152,13 +194,7 @@ extension DPPopupView {
         guard runningAnimators.isEmpty else { return }
         // Frame
         let positionAnimator = UIViewPropertyAnimator(duration: duration, dampingRatio: 1.0) {
-            switch state {
-            case .expanded:
-                self.bottomConstraint?.constant = 0
-            case .collapsed:
-                self.bottomConstraint?.constant = self.popupOffset
-            }
-            self.superview?.layoutIfNeeded()
+            self.setFinalUI(accordingTo: state)
         }
         positionAnimator.addCompletion {(finalPosition) in
             switch finalPosition {
@@ -182,6 +218,18 @@ extension DPPopupView {
         }
         positionAnimator.startAnimation()
         runningAnimators.append(positionAnimator)
+    }
+    
+    fileprivate func setFinalUI(accordingTo state: State) {
+        switch state {
+        case .expanded:
+            bottomConstraint?.constant = 0
+            layer.cornerRadius = cornerRadius
+        case .collapsed:
+            bottomConstraint?.constant = popupOffset
+            layer.cornerRadius = 0
+        }
+        self.superview?.layoutIfNeeded()
     }
     
     // Starts transition if necessary or reverses it on tap

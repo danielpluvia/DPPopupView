@@ -12,17 +12,19 @@ import DPPopupView
 class ViewController: UIViewController {
     fileprivate let popupView: DPPopupView = {
         let view = DPPopupView()
-        view.backgroundColor = .gray
+        view.containerView.backgroundColor = .yellow
+        view.containerInset = .init(top: 20, left: 20, bottom: 20, right: 20)
         return view
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        view.backgroundColor = .white
+        view.backgroundColor = .red
     }
     
     fileprivate func setupViews() {
         view.addSubview(popupView)
+        
     }
 }
