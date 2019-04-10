@@ -13,21 +13,29 @@ public protocol DPPopupViewDelegate {
     
 }
 
+// MARK: - Public methods
+public extension DPPopupView {
+    func update(state: State) {
+        animateTransitionIfNeeded(state: .expanded, duration: 1.0)
+    }
+}
+
 open class DPPopupView: UIView {
-    enum State {
+    public enum State {
         case expanded
         case collapsed
-//        case minimum
+        //        case minimum
         
         var opposite: State {
             switch self {
             case .expanded: return .collapsed
             case .collapsed: return .expanded
-//            case .minimum: return .collapsed
+                //            case .minimum: return .collapsed
             }
         }
     }
     
+    // MARK: Public variables
     public let containerView = UIView()
     open var delegate: DPPopupViewDelegate?
     open var duration: TimeInterval = 1.0
@@ -55,17 +63,17 @@ open class DPPopupView: UIView {
         return view
     }()
     
-    fileprivate var bottomConstraint: NSLayoutConstraint?
+    // MARK: Private variables
     fileprivate var currentState: State = .expanded
-    fileprivate var progressWhenInterrupted: CGFloat = 0.0
     // Tracks all running animators
     fileprivate var runningAnimators = [UIViewPropertyAnimator]()
-    // AutoLayout
+    fileprivate var progressWhenInterrupted: CGFloat = 0.0
+    // AutoLayout Constraints
     fileprivate var containerTopConstraint: NSLayoutConstraint?
     fileprivate var containerLeadingConstraint: NSLayoutConstraint?
     fileprivate var containerBottomConstraint: NSLayoutConstraint?
     fileprivate var containerTrailingConstraint: NSLayoutConstraint?
-    
+    // Gestures
     fileprivate lazy var tapGesture: UITapGestureRecognizer = {
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         return recognizer
@@ -77,7 +85,10 @@ open class DPPopupView: UIView {
     
     open override var bounds: CGRect {
         didSet {
-            setShadow()
+            if bounds.width != oldValue.width
+                || bounds.height != oldValue.height {
+                setShadow()
+            }
         }
     }
     
@@ -136,11 +147,10 @@ extension DPPopupView {
         guard let superview = superview else { return }
         NSLayoutConstraint.activate([
             leadingAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.leadingAnchor),
+            bottomAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.bottomAnchor, constant: 0.0),
             trailingAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.trailingAnchor),
             heightAnchor.constraint(equalToConstant: viewHeight)
             ])
-        bottomConstraint = bottomAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.bottomAnchor, constant: 0.0)
-        bottomConstraint?.isActive = true
     }
     
     fileprivate func setupGestures() {
@@ -216,13 +226,13 @@ extension DPPopupView {
             @unknown default:
                 fatalError("@unknown default");
             }
-            // manually reset the constraint positions
-            switch self.currentState {
-            case .expanded:
-                self.bottomConstraint?.constant = 0
-            case .collapsed:
-                self.bottomConstraint?.constant = self.popupOffset
-            }
+            //            // manually reset the constraint positions
+            //            switch self.currentState {
+            //            case .expanded:
+            //                self.bottomConstraint?.constant = 0
+            //            case .collapsed:
+            //                self.bottomConstraint?.constant = self.popupOffset
+            //            }
             self.runningAnimators.removeAll()
         }
         positionAnimator.startAnimation()
@@ -232,10 +242,12 @@ extension DPPopupView {
     fileprivate func setFinalUI(accordingTo state: State) {
         switch state {
         case .expanded:
-            bottomConstraint?.constant = 0
+            //            bottomConstraint?.constant = 0
+            transform = .identity
             layer.cornerRadius = cornerRadius
         case .collapsed:
-            bottomConstraint?.constant = popupOffset
+            //            bottomConstraint?.constant = popupOffset
+            transform = CGAffineTransform(translationX: 0, y: popupOffset)
             layer.cornerRadius = 0
         }
         self.superview?.layoutIfNeeded()
