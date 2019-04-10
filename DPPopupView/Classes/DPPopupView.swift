@@ -4,7 +4,10 @@
 //
 //  Created by Xueqiang Ma on 18/3/19.
 //
-//  Inspired by http://www.swiftkickmobile.com/building-better-app-animations-swift-uiviewpropertyanimator/ and https://developer.apple.com/videos/play/wwdc2017/230/
+//  Inspired by
+//  http://www.swiftkickmobile.com/building-better-app-animations-swift-uiviewpropertyanimator/
+//  and https://developer.apple.com/videos/play/wwdc2017/230/
+//  and https://www.youtube.com/watch?v=Yrb78U3V16g&t=601s
 //
 
 import UIKit
@@ -15,23 +18,24 @@ public protocol DPPopupViewDelegate {
 
 // MARK: - Public methods
 public extension DPPopupView {
-    func update(state: State) {
-        animateTransitionIfNeeded(state: .expanded, duration: 1.0)
-    }
+    
 }
 
 open class DPPopupView: UIView {
-    public enum State {
-        case expanded
-        case collapsed
-        //        case minimum
+    public enum State: Int, CaseIterable {
+        case expandedMax = 0
+        case expandedMin = 1
+        case collapsedMax = 2
+        case collapsedMin = 3
         
-        var opposite: State {
-            switch self {
-            case .expanded: return .collapsed
-            case .collapsed: return .expanded
-                //            case .minimum: return .collapsed
-            }
+        func pre() -> State {
+            let allStates = type(of: self).allCases
+            return allStates[(allStates.firstIndex(of: self)! - 1) % allStates.count]
+        }
+        
+        func next() -> State {
+            let allStates = type(of: self).allCases
+            return allStates[(allStates.firstIndex(of: self)! + 1) % allStates.count]
         }
     }
     
@@ -39,10 +43,9 @@ open class DPPopupView: UIView {
     public let containerView = UIView()
     open var delegate: DPPopupViewDelegate?
     open var duration: TimeInterval = 1.0
-    open var popupOffset: CGFloat = 340
-    open var viewHeight: CGFloat = 500
     open var cornerRadius: CGFloat = 10.0
     open var containerInset: UIEdgeInsets = .zero {
+        // Change the container layout's constraints according to the inset value
         didSet {
             if oldValue.top != containerInset.top {
                 containerTopConstraint?.constant = containerInset.top
@@ -64,11 +67,20 @@ open class DPPopupView: UIView {
     }()
     
     // MARK: Private variables
-    fileprivate var currentState: State = .expanded
+    fileprivate var currentState: State = .expandedMax  // current state (before animation completing)
+    fileprivate var toState: State = .expandedMin       // the state that is animated to
+    // Size
+    fileprivate var maxOffset: CGFloat {
+        get {
+            return CGFloat(bounds.height - headerHeight)
+        }
+    }
+    fileprivate let headerHeight: CGFloat = 30
     // Tracks all running animators
     fileprivate var runningAnimators = [UIViewPropertyAnimator]()
     fileprivate var progressWhenInterrupted: CGFloat = 0.0
-    // AutoLayout Constraints
+    fileprivate var offsetWhenInterrupted: CGFloat = 0.0
+    // the container's Constraints
     fileprivate var containerTopConstraint: NSLayoutConstraint?
     fileprivate var containerLeadingConstraint: NSLayoutConstraint?
     fileprivate var containerBottomConstraint: NSLayoutConstraint?
@@ -130,7 +142,7 @@ extension DPPopupView {
             headerView.topAnchor.constraint(equalTo: topAnchor),
             headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            headerView.heightAnchor.constraint(equalToConstant: 30),
+            headerView.heightAnchor.constraint(equalToConstant: headerHeight),
             ])
         // Container View
         containerTopConstraint = containerView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: containerInset.top)
@@ -146,10 +158,10 @@ extension DPPopupView {
     fileprivate func setupBottomConstraint() {
         guard let superview = superview else { return }
         NSLayoutConstraint.activate([
+            topAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.topAnchor),
             leadingAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.leadingAnchor),
-            bottomAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.bottomAnchor, constant: 0.0),
-            trailingAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.trailingAnchor),
-            heightAnchor.constraint(equalToConstant: viewHeight)
+            bottomAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.bottomAnchor),
+            trailingAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.trailingAnchor)
             ])
     }
     
@@ -169,38 +181,37 @@ extension DPPopupView {
 // MARK: - Gestures
 extension DPPopupView {
     @objc fileprivate func handleTap(recognizer: UITapGestureRecognizer) {
-        animateOrReverseRunningTransition(state: currentState.opposite, duration: duration)
+        animateOrReverseRunningTransition(state: toState, duration: duration)
     }
     
     @objc fileprivate func handlePan(recognizer: UIPanGestureRecognizer) {
         switch recognizer.state {
         case .began:
-            startInteractiveTransition(state: currentState.opposite, duration: duration)
+            runningAnimators.forEach { (animator) in
+                animator.stopAnimation(true)
+            }
+            runningAnimators.removeAll()
+            offsetWhenInterrupted = transform.ty
         case .changed:
             let translation = recognizer.translation(in: self)
-            var progress = translation.y / popupOffset
-            if currentState == .collapsed { progress *= -1 }
-            if !runningAnimators.isEmpty && runningAnimators[0].isReversed { progress *= -1 }
-            progress += progressWhenInterrupted
-            updateInteractiveTransition(fractionComplete: progress)
-        case .ended:    // https://www.youtube.com/watch?v=Yrb78U3V16g&t=601s
+            var yOffset = offsetWhenInterrupted + translation.y
+            yOffset = min(yOffset, maxOffset)
+            yOffset = max(yOffset, 0)
+            transform = CGAffineTransform(translationX: 0, y: yOffset)
+        case .ended:
+            let translation = recognizer.translation(in: self)
+            var yOffset = offsetWhenInterrupted + translation.y
+            yOffset = min(yOffset, maxOffset)
+            yOffset = max(yOffset, 0)
+            let states = nearestStates(for: yOffset)
             let yVelocity = recognizer.velocity(in: self).y
-            if yVelocity == 0 {
-                continueInteractiveTransition()
+            if yVelocity == 0 || abs(yVelocity) < 1 {
                 break
+            } else if yVelocity > 0 {
+                animateOrReverseRunningTransition(state: states[1], duration: duration / 3)
+            } else if yVelocity < 0 {
+                animateOrReverseRunningTransition(state: states[0], duration: duration / 3)
             }
-            let shouldExpand = yVelocity < 0
-            switch currentState {
-            case .expanded:
-                if (shouldExpand && !runningAnimators.isEmpty && !runningAnimators[0].isReversed) || (!shouldExpand && !runningAnimators.isEmpty && runningAnimators[0].isReversed) {
-                    runningAnimators.forEach{ $0.isReversed = !$0.isReversed }
-                }
-            case .collapsed:
-                if (!shouldExpand && !runningAnimators.isEmpty && !runningAnimators[0].isReversed) || (shouldExpand && !runningAnimators.isEmpty && runningAnimators[0].isReversed) {
-                    runningAnimators.forEach{ $0.isReversed = !$0.isReversed }
-                }
-            }
-            continueInteractiveTransition()
         default:
             break
         }
@@ -218,21 +229,15 @@ extension DPPopupView {
         positionAnimator.addCompletion {(finalPosition) in
             switch finalPosition {
             case .start:
-                self.currentState = state.opposite
+                self.currentState = state.next()
             case .end:
                 self.currentState = state
+                self.toState = state.next()
             case .current:
                 break
             @unknown default:
                 fatalError("@unknown default");
             }
-            //            // manually reset the constraint positions
-            //            switch self.currentState {
-            //            case .expanded:
-            //                self.bottomConstraint?.constant = 0
-            //            case .collapsed:
-            //                self.bottomConstraint?.constant = self.popupOffset
-            //            }
             self.runningAnimators.removeAll()
         }
         positionAnimator.startAnimation()
@@ -241,19 +246,50 @@ extension DPPopupView {
     
     fileprivate func setFinalUI(accordingTo state: State) {
         switch state {
-        case .expanded:
-            //            bottomConstraint?.constant = 0
+        case .expandedMax:
             transform = .identity
-            layer.cornerRadius = cornerRadius
-        case .collapsed:
-            //            bottomConstraint?.constant = popupOffset
-            transform = CGAffineTransform(translationX: 0, y: popupOffset)
             layer.cornerRadius = 0
+        case .expandedMin, .collapsedMax, .collapsedMin:
+            transform = CGAffineTransform(translationX: 0, y: offset(for: state))
+            layer.cornerRadius = cornerRadius
         }
         self.superview?.layoutIfNeeded()
     }
     
-    // Starts transition if necessary or reverses it on tap
+    /// Calculate the offset of a specific state.
+    fileprivate func offset(for state: State) -> CGFloat {
+        var offset: CGFloat = 0
+        switch state {
+        case .expandedMax:
+            offset = 0
+        case .expandedMin:
+            offset = maxOffset / 3
+        case .collapsedMax:
+            offset = maxOffset / 3 * 2
+        case .collapsedMin:
+            offset = maxOffset
+        }
+        return offset
+    }
+    
+    /// Calculate the state of a specific offset.
+    fileprivate func nearestStates(for offset: CGFloat) -> [State] {
+        var states: [State] = []
+        let expandedMaxOffset = self.offset(for: .expandedMax)
+        let expandedMinOffset = self.offset(for: .expandedMin)
+        let collapsedMaxOffset = self.offset(for: .collapsedMax)
+        let collapsedMinOffset = self.offset(for: .collapsedMin)
+        if offset >= expandedMaxOffset && offset < expandedMinOffset {
+            return [.expandedMax, .expandedMin]
+        } else if offset >= expandedMinOffset && offset < collapsedMaxOffset {
+            return [.expandedMin, .collapsedMax]
+        } else if offset >= collapsedMaxOffset && offset < collapsedMinOffset {
+            return [.collapsedMax, .collapsedMin]
+        }
+        return states
+    }
+    
+    /// Starts transition if necessary or reverses it on tap
     fileprivate func animateOrReverseRunningTransition(state: State, duration: TimeInterval) {
         if runningAnimators.isEmpty {
             animateTransitionIfNeeded(state: state, duration: duration)

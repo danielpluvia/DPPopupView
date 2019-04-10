@@ -13,7 +13,7 @@ class ViewController: UIViewController {
     fileprivate let popupView: DPPopupView = {
         let view = DPPopupView()
         view.containerView.backgroundColor = .yellow
-        view.containerInset = .init(top: 20, left: 20, bottom: 20, right: 20)
+        view.containerInset = .init(top: 0, left: 20, bottom: 20, right: 20)
         return view
     }()
     
