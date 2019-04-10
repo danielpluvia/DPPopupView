@@ -12,6 +12,7 @@
 		3DA21882F1587D57799282448C6E2EA1 /* Pods-DPPopupView_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 32834A1B7F2E9EEBBB493E584592BB2F /* Pods-DPPopupView_Tests-dummy.m */; };
 		4C0B1DFC820C041248B849AB18707AEA /* Pods-DPPopupView_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = B40781C485403839D07481B86673A593 /* Pods-DPPopupView_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		652988A9224CEA1600FB4154 /* DPPopupArrowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652988A8224CEA1600FB4154 /* DPPopupArrowView.swift */; };
+		657A6DB0225DC415002EF2E4 /* DPPopupHeaderLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657A6DAF225DC415002EF2E4 /* DPPopupHeaderLineView.swift */; };
 		65E19699223FD502004EC6A0 /* DPPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E19698223FD502004EC6A0 /* DPPopupView.swift */; };
 		6FA732D0A4A36D439C9FF95A898754E8 /* DPPopupView-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = D6170030B9B72CCC01EE0F9BF62A8825 /* DPPopupView-dummy.m */; };
 		7A7C32B55751A35F041FF5AE32AC5A4A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB4607EFCA7C5F75397649E792E2AFCB /* Foundation.framework */; };
@@ -51,6 +52,7 @@
 		619D7F5775540F8DA2D4A1328A9E4581 /* DPPopupView.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = DPPopupView.podspec; sourceTree = "<group>"; tabWidth = 2; };
 		63B83D33067B6B2349BF97E5B8C92E7D /* Pods_DPPopupView_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DPPopupView_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		652988A8224CEA1600FB4154 /* DPPopupArrowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DPPopupArrowView.swift; path = DPPopupView/Classes/DPPopupArrowView.swift; sourceTree = "<group>"; };
+		657A6DAF225DC415002EF2E4 /* DPPopupHeaderLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DPPopupHeaderLineView.swift; path = DPPopupView/Classes/DPPopupHeaderLineView.swift; sourceTree = "<group>"; };
 		65E19698223FD502004EC6A0 /* DPPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DPPopupView.swift; path = DPPopupView/Classes/DPPopupView.swift; sourceTree = "<group>"; };
 		6F7B6F887267C88F13CA3B0F71E30809 /* Pods-DPPopupView_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-DPPopupView_Example.modulemap"; sourceTree = "<group>"; };
 		71A74B50F9571A8C63226EF254C4A012 /* Pods-DPPopupView_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DPPopupView_Tests.release.xcconfig"; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				65E19698223FD502004EC6A0 /* DPPopupView.swift */,
+				657A6DAF225DC415002EF2E4 /* DPPopupHeaderLineView.swift */,
 				652988A8224CEA1600FB4154 /* DPPopupArrowView.swift */,
 				6AB8575944D0A4EB027147B32401A03F /* Pod */,
 				F78D8857F06F6E698A29B9E5542913DF /* Support Files */,
@@ -383,6 +386,7 @@
 			files = (
 				6FA732D0A4A36D439C9FF95A898754E8 /* DPPopupView-dummy.m in Sources */,
 				652988A9224CEA1600FB4154 /* DPPopupArrowView.swift in Sources */,
+				657A6DB0225DC415002EF2E4 /* DPPopupHeaderLineView.swift in Sources */,
 				65E19699223FD502004EC6A0 /* DPPopupView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

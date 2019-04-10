@@ -9,24 +9,31 @@
 
 import UIKit
 
+public protocol DPPopupViewDelegate {
+    
+}
+
 open class DPPopupView: UIView {
     enum State {
         case expanded
         case collapsed
+//        case minimum
         
         var opposite: State {
             switch self {
             case .expanded: return .collapsed
             case .collapsed: return .expanded
+//            case .minimum: return .collapsed
             }
         }
     }
     
     public let containerView = UIView()
+    open var delegate: DPPopupViewDelegate?
     open var duration: TimeInterval = 1.0
     open var popupOffset: CGFloat = 340
     open var viewHeight: CGFloat = 500
-    open var cornerRadius: CGFloat = 16.0
+    open var cornerRadius: CGFloat = 10.0
     open var containerInset: UIEdgeInsets = .zero {
         didSet {
             if oldValue.top != containerInset.top {
@@ -44,7 +51,7 @@ open class DPPopupView: UIView {
         }
     }
     public let headerView: UIView = {
-        let view = DPPopupArrowView()
+        let view = DPPopupHeaderLineView()
         return view
     }()
     
@@ -95,6 +102,8 @@ extension DPPopupView {
     fileprivate func initialization() {
         backgroundColor = .white
         translatesAutoresizingMaskIntoConstraints = false
+        // masked corners: only top
+        layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         setupViews()
         setupGestures()
         setShadow()
@@ -140,9 +149,9 @@ extension DPPopupView {
     }
     
     fileprivate func setShadow() {
-        layer.shadowColor = UIColor.gray.cgColor
+        layer.shadowColor = UIColor.lightGray.cgColor
         layer.shadowRadius = 6.0
-        layer.shadowOpacity = 0.4
+        layer.shadowOpacity = 0.3
         layer.shadowPath = UIBezierPath(rect: bounds).cgPath
     }
 }
