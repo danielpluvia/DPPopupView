@@ -42,7 +42,7 @@ open class DPPopupView: UIView {
     // MARK: Public variables
     public let containerView = UIView()
     open var delegate: DPPopupViewDelegate?
-    open var duration: TimeInterval = 1.0
+    open var duration: TimeInterval = 0.4
     open var cornerRadius: CGFloat = 10.0
     open var containerInset: UIEdgeInsets = .zero {
         // Change the container layout's constraints according to the inset value
@@ -181,7 +181,7 @@ extension DPPopupView {
 // MARK: - Gestures
 extension DPPopupView {
     @objc fileprivate func handleTap(recognizer: UITapGestureRecognizer) {
-        animateOrReverseRunningTransition(state: toState, duration: duration)
+        animateTransitionIfNeeded(state: toState, duration: duration)
     }
     
     @objc fileprivate func handlePan(recognizer: UIPanGestureRecognizer) {
@@ -208,9 +208,9 @@ extension DPPopupView {
             if yVelocity == 0 || abs(yVelocity) < 1 {
                 break
             } else if yVelocity > 0 {
-                animateOrReverseRunningTransition(state: states[1], duration: duration / 3)
+                animateOrReverseRunningTransition(state: states[1], duration: duration)
             } else if yVelocity < 0 {
-                animateOrReverseRunningTransition(state: states[0], duration: duration / 3)
+                animateOrReverseRunningTransition(state: states[0], duration: duration)
             }
         default:
             break
@@ -223,7 +223,7 @@ extension DPPopupView {
     fileprivate func animateTransitionIfNeeded(state: State, duration: TimeInterval) {
         guard runningAnimators.isEmpty else { return }
         // Frame
-        let positionAnimator = UIViewPropertyAnimator(duration: duration, dampingRatio: 1.0) {
+        let positionAnimator = UIViewPropertyAnimator(duration: duration, curve: .easeInOut) {
             self.setFinalUI(accordingTo: state)
         }
         positionAnimator.addCompletion {(finalPosition) in
@@ -274,7 +274,6 @@ extension DPPopupView {
     
     /// Calculate the state of a specific offset.
     fileprivate func nearestStates(for offset: CGFloat) -> [State] {
-        var states: [State] = []
         let expandedMaxOffset = self.offset(for: .expandedMax)
         let expandedMinOffset = self.offset(for: .expandedMin)
         let collapsedMaxOffset = self.offset(for: .collapsedMax)
@@ -286,7 +285,7 @@ extension DPPopupView {
         } else if offset >= collapsedMaxOffset && offset < collapsedMinOffset {
             return [.collapsedMax, .collapsedMin]
         }
-        return states
+        return []
     }
     
     /// Starts transition if necessary or reverses it on tap
