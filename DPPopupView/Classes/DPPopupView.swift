@@ -203,14 +203,15 @@ extension DPPopupView {
             var yOffset = offsetWhenInterrupted + translation.y
             yOffset = min(yOffset, maxOffset)
             yOffset = max(yOffset, 0)
-            let states = nearestStates(for: yOffset)
-            let yVelocity = recognizer.velocity(in: self).y
-            if yVelocity == 0 || abs(yVelocity) < 1 {
-                break
-            } else if yVelocity > 0 {
-                animateOrReverseRunningTransition(state: states[1], duration: duration)
-            } else if yVelocity < 0 {
-                animateOrReverseRunningTransition(state: states[0], duration: duration)
+            if let states = nearestStates(for: yOffset) {
+                let yVelocity = recognizer.velocity(in: self).y
+                if yVelocity == 0 || abs(yVelocity) < 1 {
+                    break
+                } else if yVelocity > 0 {
+                  animateOrReverseRunningTransition(state: states[1], duration: duration)
+                } else if yVelocity < 0 {
+                    animateOrReverseRunningTransition(state: states[0], duration: duration)
+                }
             }
         default:
             break
@@ -273,7 +274,7 @@ extension DPPopupView {
     }
     
     /// Calculate the state of a specific offset.
-    fileprivate func nearestStates(for offset: CGFloat) -> [State] {
+    fileprivate func nearestStates(for offset: CGFloat) -> [State]? {
         let expandedMaxOffset = self.offset(for: .expandedMax)
         let expandedMinOffset = self.offset(for: .expandedMin)
         let collapsedMaxOffset = self.offset(for: .collapsedMax)
@@ -285,7 +286,7 @@ extension DPPopupView {
         } else if offset >= collapsedMaxOffset && offset < collapsedMinOffset {
             return [.collapsedMax, .collapsedMin]
         }
-        return []
+        return nil
     }
     
     /// Starts transition if necessary or reverses it on tap
