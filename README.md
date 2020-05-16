@@ -22,7 +22,7 @@ pod 'DPPopupView'
 
 ## Author
 
-danielpluvia, danielpluvia@outlook.com
+Daniel Ma, danielpluvia@outlook.com
 
 ## License
 
